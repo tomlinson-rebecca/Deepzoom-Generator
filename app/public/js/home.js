@@ -8,8 +8,12 @@ $(document).ready(function(){
 			return true;
 		},
 		success	: function(data, status, xhr, $form){
-			window.open(data);
-			setTimeout(function(){window.location.href = '/';}, 3000);
+			setTimeout(function(){
+				window.location = window.location.href + data;
+				setTimeout(function(){
+					window.location.href = '/';
+				}, 1000);
+			}, 3000);
 		},
 		error : function(e){
 			$('.modal-loading .modal-body h3').html('FAILED!!!');

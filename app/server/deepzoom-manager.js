@@ -6,34 +6,56 @@ var archiver = require('archiver');
 
 
 exports.generateDeepzoom = function(files, callback){
+	var dir = __dirname + "/../public/collection/" + files.file.filename;
+	fs.mkdirSync(dir);
 	fs.readFile(files.file.path, function(err, data){
-
-		var newPath = __dirname + "/../public/collection/" + files.file.originalname;
+		var newPath = dir + "/" + files.file.originalname;
 		var id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.'));
-		var desFile = __dirname + "/../public/collection/" + id + '.dzi';
+		var desFile = dir + "/" + id + '.dzi';
 
-		fs.writeFile(newPath, data, function(err){
-			if(err){
-				callback(null, err);
-			}else{
-				sharp(newPath).tile(256).toFile(desFile,
-      				function(error, info){
-        			if(error){
-          				callback(null, error);
-        			}
-    			});
-				var output = fs.createWriteStream(__dirname + "/../public/collection/"+ id + '.zip');
-				var zipArchive = archiver('zip');
+		if(fs.existsSync(desFile)){
+  			fsx.removeSync(dir, function(err){
+    			if(err) return console.error(err);
+  			});
+    	}
+		if(fs.existsSync(newPath)){
+			fsx.removeSync(newPath);
+		}else{
+			fs.writeFile(newPath, data, function(err){
+				if(err){
+					callback(null, err);
+				}else{
+					sharp(newPath).tile(256).toFile(desFile,
+	      				function(error, info){
+	        			if(error){
+	        				console.log("Error here");
+	          				callback(null, error);
+	        			}else{
+	        				var output = fs.createWriteStream(__dirname + "/../public/collection/" + id + '.zip');
+							var zipArchive = archiver('zip');
 
-				zipArchive.pipe(output);
+							output.on('close', function() {
+	  							console.log(zipArchive.pointer() + ' total bytes');
+	  							console.log('archiver has been finalized and the output file descriptor has closed.');
+							});
 
-				zipArchive.bulk([
-				    { src: [id + ".dzi", id + "_*"], cwd: __dirname + "/../public/collection/", expand: true }
-				]);
+							zipArchive.on('error', function(err) {
+	  							throw err;
+							});
 
-				zipArchive.finalize();
-				callback(__dirname + "/../public/collection/"+ id + '.zip', null);
-			}
-		});
+							zipArchive.pipe(output);
+
+							zipArchive.bulk([
+							    { src: ['**/*'], cwd: dir, expand: true }
+							])
+							zipArchive.finalize();
+							callback("collection/"+ id + '.zip', null);
+	        			}
+	    			});
+				}
+			});		
+		}
+
+
 	});
 };
