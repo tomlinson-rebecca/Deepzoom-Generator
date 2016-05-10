@@ -6,7 +6,6 @@
     "multer": "1.1.0",
     "ejs": "2.4.1",
     "fs-extra": "^0.26.5",
-    "archiver": "1.0.0",
     "sharp": "*",
     "shelljs": "0.7.0"
   },

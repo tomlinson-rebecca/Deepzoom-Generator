@@ -8,6 +8,7 @@ var archiver = require('archiver');
 
 var id;
 var dir;
+var filename;
 
 var generateOne = function(newPath, desFile, callback){
 	//convert only one image
@@ -57,11 +58,20 @@ var generateBatch = function(newPath, callback){
 	var currentDir = __dirname;
 	var images = [];
 
-	console.log('newPath: '+ newPath);
-	console.log('dir: ' + dir);
-
 	exec('unzip '+newPath+' -d '+dir);
 	
+	if(fs.existsSync(dir + '/__MACOSX')){
+  		fsx.removeSync(dir + '/__MACOSX', function(err){
+    		if(err) return console.error(err);
+  		});
+    }
+
+    if(fs.existsSync(__dirname + "/../public/collection" + "/" + id + ".zip")){
+  		fsx.removeSync(__dirname + "/../public/collection" + "/" + id + ".zip", function(err){
+    		if(err) return console.error(err);
+  		});
+    }
+
 	cd(dir);
 	ls('*.*').forEach(function(file) {
 		if(file.split('.').pop() != "zip"){
@@ -71,45 +81,33 @@ var generateBatch = function(newPath, callback){
 	cd(currentDir);
 
 
-	for(var i = 0; i < images.length - 1; i ++){
+	var count = 0;
+	console.log(images);
+	for(var i = 0; i < images.length ; i ++){
 		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'))+'.dzi';
 
 		tileImage(dir+'/'+images[i], desFile, function(err){
-			if(err) callback(err);
-		});
-	}
+			count ++;
+			if(err){
+				callback(err)
+			}else if(count == images.length-1){
+				cd(__dirname + "/../public/collection");
 
-	tileImage(dir+'/'+images[images.length-1],
-		dir+'/'+images[images.length-1].substr(0, images[images.length-1].lastIndexOf('.'))+'.dzi',
-		function(err){
-			if (!err){
-				var output = fs.createWriteStream(__dirname + "/../public/collection/" + id + '.zip');
-				var zipArchive = archiver('zip');
+				exec('zip -r '+ id + '.zip ' + filename);
+				cd(currentDir);
 
-				output.on('close', function() {
-						console.log(zipArchive.pointer() + ' total bytes');
-						console.log('archiver has been finalized and the output file descriptor has closed.');
-				});
-
-				zipArchive.on('error', function(err) {
-						throw err;
-				});
-
-				zipArchive.pipe(output);
-
-				zipArchive.bulk([
-				    { src: ['**/*'], cwd: dir, expand: true }
-				])
-				zipArchive.finalize();
 				callback(null);
 			}
-	});
+		});
+
+	}
 
 };
 
 
 exports.generateDeepzoom = function(files, callback){
 	dir = __dirname + "/../public/collection/" + files.file.filename;
+	filename = files.file.filename;
 	fs.mkdirSync(dir);
 	fs.readFile(files.file.path, function(err, data){
 		var newPath = dir + "/" + files.file.originalname;
