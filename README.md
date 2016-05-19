@@ -4,4 +4,5 @@ Deepzoom images generator on NodeJS, which enables quick images generating for n
 Prerequisite: Node.JS environment
 
 Install: change to root folder, then npm install
+
 Run: node app
