@@ -11,6 +11,7 @@ var dir;
 var filename;
 var dzcName;
 var dzis = [];
+var dziNames = [];
 
 var generateOne = function(newPath, desFile, callback){
 	//convert only one image
@@ -98,8 +99,10 @@ var generateBatch = function(newPath, callback){
 	  });
 	
 	for(var i = 0; i < images.length ; i ++){
-		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO where its given the .dzi name? I removed it
 		
+		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO where its given the .dzi name? I removed it
+		dziNames[i] = images[i].substr(0, images[i].lastIndexOf('.'));
+		console.log(images[i].substr(0, images[i].lastIndexOf('.')));
 		 //data should have the contents of the file. Place this somewhere we can access each .dzi
 		
 		
@@ -174,8 +177,35 @@ exports.generateDeepzoom = function(files, callback){
 								callback("collection/"+ id + '.zip', null);
 
 								//add each .dzi's information to the .dzc
-								for(var i = 0; i < dzis.length ; i ++){
+								for(var i = 0; i < dzis.length ; i++){
+								//console.log(dziNames[i]);
+									var currName = dziNames[i];
 									
+									(function(x) {
+										fs.readFile(dzis[x], 'utf8', (err, data) => {
+											if (err) throw err;
+	
+											//parse the .dzi and obtain the size attribute
+											var n = data.indexOf("<Size");
+											var res = data.substring(n);
+											var m = res.indexOf("/>");
+											var size =  res.substring(0, m+2);
+											console.log(size);
+											console.log(x);
+											console.log(dziNames[x]);
+	
+											//TODO: With size, make each entry for the .dzc
+											fs.appendFile(dzcName, 
+												function (err) {
+													if (err) throw err;
+													//console.log(dzis[i]);
+												});
+										  
+										});
+
+									})(i)
+									
+									/*
 									fs.readFile(dzis[i], 'utf8', (err, data) => {
 										if (err) throw err;
 
@@ -185,14 +215,16 @@ exports.generateDeepzoom = function(files, callback){
 										var m = res.indexOf("/>");
 										var size =  res.substring(0, m+2);
 										console.log(size);
+										console.log(currName);
 
-
-										fs.appendFile(dzcName, ' test', 
+										//TODO: With size, make each entry for the .dzc
+										fs.appendFile(dzcName, 
 											function (err) {
 												if (err) throw err;
-												console.log('Finished dzc!');
+												console.log(dzis[i]);
 											});
 									  });
+									  */
 									  
 								}
 							}
