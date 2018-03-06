@@ -41,6 +41,7 @@ var generateOne = function(newPath, desFile, callback){
 	});
 };
 
+//tiling is a sharp thing
 var tileImage = function(newPath, desFile, callback){
 	sharp(newPath).tile(256).toFile(desFile,
 			function(error, info){
@@ -82,10 +83,10 @@ var generateBatch = function(newPath, callback){
 
 
 	var count = 0;
-	console.log(images);
+	console.log(images); //list of each image to be processed
 	
 	for(var i = 0; i < images.length ; i ++){
-		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'))+'.dzi';
+		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //where its given the .dzi name?
 
 		tileImage(dir+'/'+images[i], desFile, function(err){
 			count ++;
@@ -105,15 +106,30 @@ var generateBatch = function(newPath, callback){
 
 };
 
-
+//gets called from homepage when button is pressed?
 exports.generateDeepzoom = function(files, callback){
+
+
+	//makes the folder to store the collection
 	dir = __dirname + "/../public/collection/" + files.file.filename;
 	filename = files.file.filename;
+
+	console.log("Entering generateDeepzoom");
+	console.log("dir: "+dir);
+	console.log("filename: "+filename); 
+
 	fs.mkdirSync(dir);
 	fs.readFile(files.file.path, function(err, data){
-		var newPath = dir + "/" + files.file.originalname;
-		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.'));
-		var desFile = dir + "/" + id + '.dzi'; //TODO could this be causing the .dzi in the name?
+
+		//organizing where the outputted folder will go
+
+		var newPath = dir + "/" + files.file.originalname; //put original zip in the results
+		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.')); //name of given zip (birds etc)
+		var desFile = dir + "/" + id + '.dzi'; //TODO could this be causing the .dzi in the name? birds_images.dzi... prob replaced later
+		
+		console.log("newPath: "+newPath);
+		console.log("id: "+id);
+		console.log("desFile: "+desFile);
 
 		if(fs.existsSync(desFile)){
   			fsx.removeSync(dir, function(err){
@@ -128,6 +144,8 @@ exports.generateDeepzoom = function(files, callback){
 					callback(null, err);
 				}else{
 					var extension = files.file.originalname.split('.').pop();
+
+					//where the actual conversion will take place
 					if(extension == 'zip'){
 						generateBatch(newPath, function(e){
 							if(e){
