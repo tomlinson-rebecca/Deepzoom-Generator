@@ -10,6 +10,7 @@ var id;
 var dir;
 var filename;
 var dzcName;
+var dzis = [];
 
 var generateOne = function(newPath, desFile, callback){
 	//convert only one image
@@ -99,21 +100,17 @@ var generateBatch = function(newPath, callback){
 	for(var i = 0; i < images.length ; i ++){
 		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO where its given the .dzi name? I removed it
 		
-		/* //data should have the contents of the file. Place this somewhere we can access each .dzi
-		//use substring and indexOf to get the Size stuff
-				fs.readFile(filename, (err, data) => {
-				if (err) throw err;
-				console.log(data);
-			});
-		*/
+		 //data should have the contents of the file. Place this somewhere we can access each .dzi
 		
+		
+		 dzis[i] = desFile+".dzi";
 		tileImage(dir+'/'+images[i], desFile, function(err){
 			count ++;
 			if(err){
 				callback(err)
 			}else if(count == images.length-1){
 				cd(__dirname + "/../public/collection");
-			
+				
 				//console.log("filename: " +filename);
 				exec('zip -r '+ id + '.zip ' + filename);
 				cd(currentDir);
@@ -121,10 +118,9 @@ var generateBatch = function(newPath, callback){
 				callback(null);
 			}
 		});
-
 	
 	}
-
+	
 };
 
 //gets called from homepage when button is pressed?
@@ -176,6 +172,14 @@ exports.generateDeepzoom = function(files, callback){
 								callback(null, error);
 							}else{
 								callback("collection/"+ id + '.zip', null);
+								for(var i = 0; i < dzis.length ; i ++){
+					
+									console.log("Dzis: "+dzis[i]);
+									fs.readFile(dzis[i], 'utf8', (err, data) => {
+										if (err) throw err;
+										console.log(data);
+									  });
+								}
 							}
 						});
 					}else{
@@ -192,12 +196,13 @@ exports.generateDeepzoom = function(files, callback){
 				//.dzc generation
 				//would init the top part of the .dzc here, and append each <I/> entry in the loop.
 				//at the end, append closing tags. Booom, you got a .dzc!
-
+				
+				
 				//append closer stuff to the .dzc
 				fs.appendFile(dzcName, '  </Items></Collection>', 
 				function (err) {
 					if (err) throw err;
-					console.log('Saved!');
+					console.log('Finished dzc!');
 				  });
 				
 
