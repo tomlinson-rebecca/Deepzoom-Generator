@@ -161,7 +161,6 @@ exports.generateDeepzoom = function(files, callback){
 			fsx.removeSync(newPath);
 		}else{
 
-			
 			fs.writeFile(newPath, data, function(err){
 				if(err){
 					callback(null, err);
@@ -195,7 +194,11 @@ exports.generateDeepzoom = function(files, callback){
 											console.log(dziNames[x]);
 	
 											//TODO: With size, make each entry for the .dzc
-											fs.appendFile(dzcName, 
+											let appendStr = ' <I Id="'+dziNames[x]+'" N="'+x+'" Source="'+dziNames[x]+'.dzi"> ' +
+												size +
+												'</I>' ;
+											console.log(appendStr);
+											fs.appendFile(dzcName, appendStr,
 												function (err) {
 													if (err) throw err;
 													//console.log(dzis[i]);
@@ -204,31 +207,16 @@ exports.generateDeepzoom = function(files, callback){
 										});
 
 									})(i)
-									
-									/*
-									fs.readFile(dzis[i], 'utf8', (err, data) => {
-										if (err) throw err;
-
-										//parse the .dzi and obtain the size attribute
-										var n = data.indexOf("<Size");
-										var res = data.substring(n);
-										var m = res.indexOf("/>");
-										var size =  res.substring(0, m+2);
-										console.log(size);
-										console.log(currName);
-
-										//TODO: With size, make each entry for the .dzc
-										fs.appendFile(dzcName, 
-											function (err) {
-												if (err) throw err;
-												console.log(dzis[i]);
-											});
-									  });
-									  */
-									  
 								}
+								
 							}
 						});
+						//append closer stuff to the .dzc
+						fs.appendFile(dzcName, '  </Items></Collection>', 
+						function (err) {
+							if (err) throw err;
+							console.log('Finished dzc!');
+			});
 					}else{
 						generateOne(newPath, desFile, function(e){
 							if(e){
@@ -243,18 +231,10 @@ exports.generateDeepzoom = function(files, callback){
 				//.dzc generation
 				//would init the top part of the .dzc here, and append each <I/> entry in the loop.
 				//at the end, append closing tags. Booom, you got a .dzc!
-				
-				
-				//append closer stuff to the .dzc
-				fs.appendFile(dzcName, '  </Items></Collection>', 
-				function (err) {
-					if (err) throw err;
-					console.log('Finished dzc!');
-				  });
-				
-
 
 			});		
+			
+
 		}
 	});
 };
