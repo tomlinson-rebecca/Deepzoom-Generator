@@ -83,6 +83,7 @@ var generateBatch = function(newPath, callback){
 
 	var count = 0;
 	console.log(images);
+	
 	for(var i = 0; i < images.length ; i ++){
 		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'))+'.dzi';
 
@@ -112,7 +113,7 @@ exports.generateDeepzoom = function(files, callback){
 	fs.readFile(files.file.path, function(err, data){
 		var newPath = dir + "/" + files.file.originalname;
 		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.'));
-		var desFile = dir + "/" + id + '.dzi';
+		var desFile = dir + "/" + id + '.dzi'; //TODO could this be causing the .dzi in the name?
 
 		if(fs.existsSync(desFile)){
   			fsx.removeSync(dir, function(err){

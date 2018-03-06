@@ -1,12 +1,12 @@
 {
   "name": "deepzoom_generator",
   "dependencies": {
+    "ejs": "2.4.1",
     "express": "4.13.3",
     "express-session": "1.11.3",
-    "multer": "1.1.0",
-    "ejs": "2.4.1",
     "fs-extra": "^0.26.5",
-    "sharp": "*",
+    "multer": "1.1.0",
+    "sharp": "^0.20.0",
     "shelljs": "0.7.0"
   },
   "engines": {
