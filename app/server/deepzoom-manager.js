@@ -172,13 +172,28 @@ exports.generateDeepzoom = function(files, callback){
 								callback(null, error);
 							}else{
 								callback("collection/"+ id + '.zip', null);
+
+								//add each .dzi's information to the .dzc
 								for(var i = 0; i < dzis.length ; i ++){
-					
-									console.log("Dzis: "+dzis[i]);
+									
 									fs.readFile(dzis[i], 'utf8', (err, data) => {
 										if (err) throw err;
-										console.log(data);
+
+										//parse the .dzi and obtain the size attribute
+										var n = data.indexOf("<Size");
+										var res = data.substring(n);
+										var m = res.indexOf("/>");
+										var size =  res.substring(0, m+2);
+										console.log(size);
+
+
+										fs.appendFile(dzcName, ' test', 
+											function (err) {
+												if (err) throw err;
+												console.log('Finished dzc!');
+											});
 									  });
+									  
 								}
 							}
 						});
