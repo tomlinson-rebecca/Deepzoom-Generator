@@ -86,16 +86,14 @@ var generateBatch = function(newPath, callback){
 	});
 	cd(currentDir);
 
-
 	var count = 0;
 	console.log(images); //list of each image to be processed
 
 	//create a .dzc file and header content
 	fs.writeFile(dzcName, '<Collection xmlns="http://schemas.microsoft.com/deepzoom/2009" '+
-	'MaxLevel="14" TileSize="256" Format="jpg"> <Items>', 
+	'MaxLevel="14" TileSize="256" Format="jpeg"> \t <Items> \n', 
 	function (err) {
 		if (err) throw err;
-		console.log('Saved!');
 	  });
 	
 	for(var i = 0; i < images.length ; i ++){
@@ -208,7 +206,7 @@ exports.generateDeepzoom = function(files, callback){
 					//TODO: With size, make each entry for the .dzc
 					let appendStr = ' <I Id="'+dziNames[x]+'" N="'+x+'" Source="'+dziNames[x]+'.dzi"> ' +
 						size +
-						'</I>' ;
+						'</I> \n' ;
 					console.log(appendStr);
 					fs.appendFile(dzcName, appendStr,
 						function (err) {
