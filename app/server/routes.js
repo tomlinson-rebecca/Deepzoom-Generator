@@ -15,7 +15,7 @@ module.exports = function(app) {
 	app.post('/uploadCollection', uploading.single('file'), function(req, res){
 		DM.generateDeepzoom(req, function(o, e){
 			
-			
+			/*
 			DM.generateDZC(req, function(dzcFile, err){
 				console.log("Appending final stuff to DZC.");
 
@@ -30,13 +30,13 @@ module.exports = function(app) {
 
 				//Maybe could call dm.genDzc here, after all the deepzoom gen is done
 
-			}) 
+			}) */
 
 			if (e){
-				console.log("e");
+				
 				res.status(400).send(e);
 			} else{
-				console.log("o");
+				
 				res.status(200).send(o);
 				
 			}

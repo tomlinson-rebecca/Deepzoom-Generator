@@ -173,43 +173,11 @@ exports.generateDeepzoom = function(files, callback){
 							if(e){
 								callback(null, error);
 							}else{
+
+								generateDZC();
+
 								callback("collection/"+ id + '.zip', null);
 
-								/*
-								//add each .dzi's information to the .dzc
-								for(var i = 0; i < dzis.length ; i++){
-								//console.log(dziNames[i]);
-									var currName = dziNames[i];
-									
-									(function(x) {
-										fs.readFile(dzis[x], 'utf8', (err, data) => {
-											if (err) throw err;
-	
-											//parse the .dzi and obtain the size attribute
-											var n = data.indexOf("<Size");
-											var res = data.substring(n);
-											var m = res.indexOf("/>");
-											var size =  res.substring(0, m+2);
-											console.log(size);
-											console.log(x);
-											console.log(dziNames[x]);
-	
-											//TODO: With size, make each entry for the .dzc
-											let appendStr = ' <I Id="'+dziNames[x]+'" N="'+x+'" Source="'+dziNames[x]+'.dzi"> ' +
-												size +
-												'</I>' ;
-											console.log(appendStr);
-											fs.appendFile(dzcName, appendStr,
-												function (err) {
-													if (err) throw err;
-													//console.log(dzis[i]);
-												});
-										  
-										});
-
-									})(i)
-								} */
-								
 							}
 						});
 						
@@ -223,11 +191,6 @@ exports.generateDeepzoom = function(files, callback){
 						});
 					}
 				}
-				
-				//.dzc generation
-				//would init the top part of the .dzc here, and append each <I/> entry in the loop.
-				//at the end, append closing tags. Booom, you got a .dzc!
-
 			});		
 			
 
@@ -235,7 +198,7 @@ exports.generateDeepzoom = function(files, callback){
 	});
 };
 
-exports.generateDZC = function(files, callback){
+ var generateDZC = function(){
 	console.log("Gen callback");
 	var count = 0; //wait until all .dzis are read to callback
 	//add each .dzi's information to the .dzc
@@ -265,9 +228,15 @@ exports.generateDZC = function(files, callback){
 						function (err) {
 							if (err) throw err;
 							count++;
+
 							if(count == dzis.length-1){
 								//append final stuff in the callback
-								callback(dzcName, null);
+								//append closer stuff to the .dzc
+								fs.appendFile(dzcName, '  </Items></Collection>', 
+								function (err) {
+									if (err) throw err;
+									console.log('Finished dzc!');
+								});
 							}
 
 						});
@@ -276,15 +245,7 @@ exports.generateDZC = function(files, callback){
 				
 			})(i)
 		}
-       
 		
-
-		//append closer stuff to the .dzc
-		fs.appendFile(dzcName, '  </Items></Collection>', 
-		function (err) {
-			if (err) throw err;
-			console.log('Finished dzc!');
-		});
 };
 
 
