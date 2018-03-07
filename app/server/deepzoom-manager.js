@@ -100,13 +100,10 @@ var generateBatch = function(newPath, callback){
 	
 	for(var i = 0; i < images.length ; i ++){
 		
-		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO where its given the .dzi name? I removed it
+		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO I removed additional .dzi appending
 		dziNames[i] = images[i].substr(0, images[i].lastIndexOf('.'));
-		console.log(images[i].substr(0, images[i].lastIndexOf('.')));
-		 //data should have the contents of the file. Place this somewhere we can access each .dzi
-		
-		
-		 dzis[i] = desFile+".dzi";
+		dzis[i] = desFile+".dzi";
+
 		tileImage(dir+'/'+images[i], desFile, function(err){
 			count ++;
 			if(err){
@@ -114,7 +111,6 @@ var generateBatch = function(newPath, callback){
 			}else if(count == images.length-1){
 				cd(__dirname + "/../public/collection");
 				
-				//console.log("filename: " +filename);
 				exec('zip -r '+ id + '.zip ' + filename);
 				cd(currentDir);
 
@@ -126,7 +122,7 @@ var generateBatch = function(newPath, callback){
 	
 };
 
-//gets called from homepage when button is pressed?
+
 exports.generateDeepzoom = function(files, callback){
 
 
@@ -134,23 +130,14 @@ exports.generateDeepzoom = function(files, callback){
 	dir = __dirname + "/../public/collection/" + files.file.filename;
 	filename = files.file.filename;
 
-	console.log("Entering generateDeepzoom");
-	console.log("dir: "+dir);
-	console.log("filename: "+filename); 
-
 	fs.mkdirSync(dir);
 	fs.readFile(files.file.path, function(err, data){
 
 		//organizing where the outputted folder will go
-
-		var newPath = dir + "/" + files.file.originalname; //put original zip in the results
-		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.')); //name of given zip (birds etc)
-		var desFile = dir + "/" + id + '.dzi'; //TODO could this be causing the .dzi in the name? birds_images.dzi... prob replaced later
+		var newPath = dir + "/" + files.file.originalname; 
+		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.')); 
+		var desFile = dir + "/" + id + '.dzi'; 
 		dzcName = dir+'/'+id+'.dzc';
-
-		console.log("newPath: "+newPath);
-		console.log("id: "+id);
-		console.log("desFile: "+desFile);
 
 		if(fs.existsSync(desFile)){
   			fsx.removeSync(dir, function(err){
@@ -167,17 +154,16 @@ exports.generateDeepzoom = function(files, callback){
 				}else{
 					var extension = files.file.originalname.split('.').pop();
 
-					//where the actual conversion will take place
 					if(extension == 'zip'){
 						generateBatch(newPath, function(e){
 							if(e){
 								callback(null, error);
 							}else{
-
-								generateDZC();
-
-								callback("collection/"+ id + '.zip', null);
-
+								//return after generating .dzc
+								generateDZC(function(){
+									callback("collection/"+ id + '.zip', null);
+								});
+								
 							}
 						});
 						
@@ -198,8 +184,8 @@ exports.generateDeepzoom = function(files, callback){
 	});
 };
 
- var generateDZC = function(){
-	console.log("Gen callback");
+ var generateDZC = function(callback){
+	
 	var count = 0; //wait until all .dzis are read to callback
 	//add each .dzi's information to the .dzc
 	for(var i = 0; i < dzis.length ; i++){
