@@ -155,6 +155,7 @@ exports.generateDeepzoom = function(files, callback){
 					if(extension == 'zip'){
 						generateBatch(newPath, function(e){
 							if(e){
+								
 								callback(null, error);
 							}else{
 								//return after generating .dzc
@@ -170,7 +171,10 @@ exports.generateDeepzoom = function(files, callback){
 							if(e){
 								callback(null, error);
 							}else{
-								callback("collection/"+ id + '.zip', null);
+								
+								generateDZC(function(){
+									callback("collection/"+ id + '.zip', null);
+								});
 							}
 						});
 					}
@@ -199,15 +203,13 @@ exports.generateDeepzoom = function(files, callback){
 					var res = data.substring(n);
 					var m = res.indexOf("/>");
 					var size =  res.substring(0, m+2);
-					console.log(size);
-					console.log(x);
-					console.log(dziNames[x]);
+					
 
 					//TODO: With size, make each entry for the .dzc
 					let appendStr = ' <I Id="'+dziNames[x]+'" N="'+x+'" Source="'+dziNames[x]+'.dzi"> ' +
 						size +
 						'</I> \n' ;
-					console.log(appendStr);
+					
 					fs.appendFile(dzcName, appendStr,
 						function (err) {
 							if (err) throw err;
@@ -219,7 +221,7 @@ exports.generateDeepzoom = function(files, callback){
 								fs.appendFile(dzcName, '  </Items></Collection>', 
 								function (err) {
 									if (err) throw err;
-									console.log('Finished dzc!');
+									
 								});
 							}
 
