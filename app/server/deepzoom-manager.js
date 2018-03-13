@@ -9,11 +9,18 @@ var archiver = require('archiver');
 var id;
 var dir;
 var filename;
+
+//used to generate a dzc
 var dzcName;
 var dzis = [];
 var dziNames = [];
 
 var generateOne = function(newPath, desFile, callback){
+	
+	var imgName = newPath.substr(newPath.lastIndexOf('/') + 1);
+	dziNames[0] = imgName.substr(0, imgName.lastIndexOf('.'));
+	dzis[0] = desFile+".dzi";
+
 	//convert only one image
 	sharp(newPath).tile(256).toFile(desFile,
 			function(error, info){
@@ -87,12 +94,7 @@ var generateBatch = function(newPath, callback){
 	var count = 0;
 	console.log(images); //list of each image to be processed
 
-	//create a .dzc file and header content
-	fs.writeFile(dzcName, '<Collection xmlns="http://schemas.microsoft.com/deepzoom/2009" '+
-	'MaxLevel="14" TileSize="256" Format="jpeg"> \t <Items> \n', 
-	function (err) {
-		if (err) throw err;
-	  });
+	
 	
 	for(var i = 0; i < images.length ; i ++){
 		
@@ -142,6 +144,14 @@ exports.generateDeepzoom = function(files, callback){
 		}else{
 
 			fs.writeFile(newPath, data, function(err){
+				//create a .dzc file and header content
+				fs.writeFile(dzcName, '<Collection xmlns="http://schemas.microsoft.com/deepzoom/2009" '+
+				'MaxLevel="14" TileSize="256" Format="jpeg"> \t <Items> \n', 
+				function (err) {
+					if (err) throw err;
+				});
+
+
 				if(err){
 					callback(null, err);
 				}else{
@@ -153,6 +163,7 @@ exports.generateDeepzoom = function(files, callback){
 								
 								callback(null, error);
 							}else{
+								
 								generateDZC(function(){
 									callback("collection/"+ id + '.zip', null);
 								});
@@ -180,6 +191,9 @@ exports.generateDeepzoom = function(files, callback){
 
  var generateDZC = function(callback){
 	
+	console.log(dzis);
+	console.log(dziNames);
+
 	var count = 0; //wait until all .dzis are read to callback
 	//add each .dzi's information to the .dzc
 	for(var i = 0; i < dzis.length ; i++){
