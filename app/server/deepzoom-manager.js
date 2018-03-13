@@ -31,6 +31,13 @@ var generateOne = function(newPath, desFile, callback){
 			var output = fs.createWriteStream(__dirname + "/../public/collection/" + id + '.zip');
 			var zipArchive = archiver('zip');
 
+			//create a .dzc file and header content
+			fs.writeFile(dzcName, '<Collection xmlns="http://schemas.microsoft.com/deepzoom/2009" '+
+			'MaxLevel="14" TileSize="256" Format="jpeg"> \t <Items> \n', 
+			function (err) {
+				if (err) throw err;
+			});
+
 			output.on('close', function() {
 					console.log(zipArchive.pointer() + ' total bytes');
 					console.log('archiver has been finalized and the output file descriptor has closed.');
@@ -94,6 +101,12 @@ var generateBatch = function(newPath, callback){
 	var count = 0;
 	console.log(images); //list of each image to be processed
 
+	//create a .dzc file and header content
+	fs.writeFile(dzcName, '<Collection xmlns="http://schemas.microsoft.com/deepzoom/2009" '+
+	'MaxLevel="14" TileSize="256" Format="jpeg"> \t <Items> \n', 
+	function (err) {
+		if (err) throw err;
+	});
 	
 	
 	for(var i = 0; i < images.length ; i ++){
@@ -122,7 +135,8 @@ var generateBatch = function(newPath, callback){
 
 
 exports.generateDeepzoom = function(files, callback){
-
+	dzis = [];
+	dNames = [];
 	dir = __dirname + "/../public/collection/" + files.file.filename;
 	filename = files.file.filename;
 
@@ -144,13 +158,6 @@ exports.generateDeepzoom = function(files, callback){
 		}else{
 
 			fs.writeFile(newPath, data, function(err){
-				//create a .dzc file and header content
-				fs.writeFile(dzcName, '<Collection xmlns="http://schemas.microsoft.com/deepzoom/2009" '+
-				'MaxLevel="14" TileSize="256" Format="jpeg"> \t <Items> \n', 
-				function (err) {
-					if (err) throw err;
-				});
-
 
 				if(err){
 					callback(null, err);
@@ -220,7 +227,7 @@ exports.generateDeepzoom = function(files, callback){
 							if (err) throw err;
 							count++;
 
-							if(count == dzis.length-1){
+							if(count == dzis.length){
 								fs.appendFile(dzcName, '  </Items></Collection>', 
 								function (err) {
 									if (err) throw err;
