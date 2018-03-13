@@ -55,8 +55,6 @@ var tileImage = function(newPath, desFile, callback){
 			callback(null);
 		}
 	});
-
-
 };
 
 var generateBatch = function(newPath, callback){
@@ -123,15 +121,12 @@ var generateBatch = function(newPath, callback){
 
 exports.generateDeepzoom = function(files, callback){
 
-
-	//makes the folder to store the collection
 	dir = __dirname + "/../public/collection/" + files.file.filename;
 	filename = files.file.filename;
 
 	fs.mkdirSync(dir);
 	fs.readFile(files.file.path, function(err, data){
 
-		//organizing where the outputted folder will go
 		var newPath = dir + "/" + files.file.originalname; 
 		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.')); 
 		var desFile = dir + "/" + id + '.dzi'; 
@@ -158,7 +153,6 @@ exports.generateDeepzoom = function(files, callback){
 								
 								callback(null, error);
 							}else{
-								//return after generating .dzc
 								generateDZC(function(){
 									callback("collection/"+ id + '.zip', null);
 								});
@@ -180,8 +174,6 @@ exports.generateDeepzoom = function(files, callback){
 					}
 				}
 			});		
-			
-
 		}
 	});
 };
@@ -191,7 +183,7 @@ exports.generateDeepzoom = function(files, callback){
 	var count = 0; //wait until all .dzis are read to callback
 	//add each .dzi's information to the .dzc
 	for(var i = 0; i < dzis.length ; i++){
-		//console.log(dziNames[i]);
+
 			var currName = dziNames[i];
 			
 			(function(x) {
@@ -204,8 +196,7 @@ exports.generateDeepzoom = function(files, callback){
 					var m = res.indexOf("/>");
 					var size =  res.substring(0, m+2);
 					
-
-					//TODO: With size, make each entry for the .dzc
+					//make entry for each dzi
 					let appendStr = ' <I Id="'+dziNames[x]+'" N="'+x+'" Source="'+dziNames[x]+'.dzi"> ' +
 						size +
 						'</I> \n' ;
@@ -216,13 +207,11 @@ exports.generateDeepzoom = function(files, callback){
 							count++;
 
 							if(count == dzis.length-1){
-								//append final stuff in the callback
-								//append closer stuff to the .dzc
 								fs.appendFile(dzcName, '  </Items></Collection>', 
 								function (err) {
 									if (err) throw err;
-									
 								});
+								callback();
 							}
 
 						});
