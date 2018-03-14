@@ -170,10 +170,12 @@ exports.generateDeepzoom = function(files, callback){
 								
 								callback(null, error);
 							}else{
-								
+								generateDZC(null);
+								callback("collection/"+ id + '.zip', null);
+								/*
 								generateDZC(function(){
 									callback("collection/"+ id + '.zip', null);
-								});
+								});*/
 								
 							}
 						});
@@ -231,8 +233,10 @@ exports.generateDeepzoom = function(files, callback){
 								fs.appendFile(dzcName, '  </Items></Collection>', 
 								function (err) {
 									if (err) throw err;
+									console.log("generated dzc");
+									//callback(null);
 								});
-								callback();
+								
 							}
 
 						});
