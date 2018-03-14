@@ -111,7 +111,7 @@ var generateBatch = function(newPath, callback){
 	
 	for(var i = 0; i < images.length ; i ++){
 		
-		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO I removed additional .dzi appending
+		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'))+'.dzi';  //TODO I removed additional .dzi appending
 		dziNames[i] = images[i].substr(0, images[i].lastIndexOf('.'));
 		dzis[i] = desFile+".dzi";
 
@@ -170,13 +170,14 @@ exports.generateDeepzoom = function(files, callback){
 								
 								callback(null, error);
 							}else{
-								generateDZC(null);
-								callback("collection/"+ id + '.zip', null);
-								/*
+								//generateDZC(null) 
+								//callback("collection/"+ id + '.zip', null);
+								
+								
 								generateDZC(function(){
 									callback("collection/"+ id + '.zip', null);
-								});*/
-								
+								}); 
+ 								
 							}
 						});
 						
@@ -234,7 +235,7 @@ exports.generateDeepzoom = function(files, callback){
 								function (err) {
 									if (err) throw err;
 									console.log("generated dzc");
-									//callback(null);
+									callback(null);
 								});
 								
 							}
