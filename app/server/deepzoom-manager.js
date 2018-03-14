@@ -111,7 +111,7 @@ var generateBatch = function(newPath, callback){
 	
 	for(var i = 0; i < images.length ; i ++){
 		
-		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'))+'.dzi';  //TODO I removed additional .dzi appending
+		var desFile = dir+'/'+images[i].substr(0, images[i].lastIndexOf('.'));  //TODO I removed additional .dzi appending
 		dziNames[i] = images[i].substr(0, images[i].lastIndexOf('.'));
 		dzis[i] = desFile+".dzi";
 
@@ -145,7 +145,7 @@ exports.generateDeepzoom = function(files, callback){
 
 		var newPath = dir + "/" + files.file.originalname; 
 		id = files.file.originalname.substr(0, files.file.originalname.lastIndexOf('.')); 
-		var desFile = dir + "/" + id + '.dzi'; 
+		var desFile = dir + "/" + id; //removed + '.dzi' 
 		dzcName = dir+'/'+id+'.dzc';
 
 		if(fs.existsSync(desFile)){
